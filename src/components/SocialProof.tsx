@@ -11,26 +11,7 @@ const SocialProof = () => {
 
   return (
     <section className="relative py-24 overflow-hidden border-t border-border/50">
-      <div className="container mx-auto px-4">
-        {/* Trusted By Section */}
-        <div className="text-center mb-16">
-          <p className="text-sm text-muted-foreground font-mono mb-8">TRUSTED BY SECURITY TEAMS AT</p>
-          
-          {/* Logo Placeholders */}
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
-            {logos.map((logo, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-center w-24 h-12 rounded-lg bg-muted/30 border border-border hover:border-primary/30 transition-all duration-300 group"
-              >
-                <span className="font-mono font-bold text-muted-foreground group-hover:text-primary transition-colors">
-                  {logo.initial}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-        
+
         {/* A.C.I.D. Intelligence Badge */}
         <div className="flex justify-center">
           <div className="relative inline-flex items-center gap-4 px-8 py-4 rounded-xl bg-gradient-to-r from-neon-purple/10 via-primary/10 to-neon-purple/10 border border-primary/30 hover:border-primary/50 transition-all duration-300 group">
