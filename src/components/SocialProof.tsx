@@ -11,7 +11,8 @@ const SocialProof = () => {
 
   return (
     <section className="relative py-24 overflow-hidden border-t border-border/50">
-
+      <div className="container mx-auto px-4">
+        
         {/* A.C.I.D. Intelligence Badge */}
         <div className="flex justify-center">
           <div className="relative inline-flex items-center gap-4 px-8 py-4 rounded-xl bg-gradient-to-r from-neon-purple/10 via-primary/10 to-neon-purple/10 border border-primary/30 hover:border-primary/50 transition-all duration-300 group">
