@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { NeonInput } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Mail, ArrowRight, Users, CheckCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const WaitlistSection = () => {
   const [email, setEmail] = useState("");
@@ -33,17 +34,41 @@ const WaitlistSection = () => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setEmail("");
-    
-    toast({
-      title: "You're on the list!",
-      description: "We'll notify you when Cyber Sentinel launches.",
-    });
+    try {
+      const { error } = await supabase
+        .from('waitlist')
+        .insert([{ email }]);
+
+      if (error) {
+        if (error.code === '23505') { // Unique violation
+          toast({
+            title: "Already on the list!",
+            description: "This email is already registered for our waitlist.",
+          });
+          setIsSubmitted(true);
+          setEmail("");
+          return;
+        }
+        throw error;
+      }
+
+      setIsSubmitted(true);
+      setEmail("");
+      
+      toast({
+        title: "You're on the list!",
+        description: "We'll notify you when Cyber Sentinel launches.",
+      });
+    } catch (error: any) {
+      console.error('Error joining waitlist:', error);
+      toast({
+        title: "Something went wrong",
+        description: "Failed to join the waitlist. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
