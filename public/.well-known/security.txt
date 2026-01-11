@@ -1,0 +1,5 @@
+Contact: mailto:your-email@example.com
+Expires: 2027-01-01T00:00:00.000Z
+Acknowledgements: https://github.com/manu-j3400/coming-soon
+Policy: Please report any security vulnerabilities to the contact email provided. We aim to respond within 48 hours.
+Preferred-Languages: en
