@@ -12,6 +12,7 @@ const WaitlistSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submitting email:", email);
     
     if (!email.trim()) {
       toast({
@@ -35,11 +36,13 @@ const WaitlistSection = () => {
     setIsSubmitting(true);
     
     try {
+      console.log("Inserting email into waitlist:", email);
       const { error } = await supabase
         .from('waitlist')
         .insert([{ email }]);
 
       if (error) {
+        console.log("Supabase error:", error);
         if (error.code === '23505') { // Unique violation
           toast({
             title: "Already on the list!",
@@ -95,13 +98,13 @@ const WaitlistSection = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border mb-8">
             <Users className="w-4 h-4 text-primary" />
             <span className="font-mono text-sm">
-              Join <span className="text-primary font-semibold">500+</span> developers waiting for the Beta launch.
+              Join <span className="text-primary font-semibold">50+</span> developers waiting for the Beta launch.
             </span>
           </div>
           
           {/* Form */}
           {!isSubmitted ? (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <form onSubmit={handleSubmit} className="relative z-10 flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <div className="flex-1 relative">
                 <NeonInput
                   type="email"
@@ -119,16 +122,34 @@ const WaitlistSection = () => {
                 disabled={isSubmitting}
                 className="gap-2"
               >
-                {isSubmitting ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    Joining...
-                  </>
+                {isSubmitted ? (
+                  <div className="flex flex-col items-center p-8 rounded-xl bg-primary/5 border border-primary/20 max-w-md mx-auto animate-in fade-in zoom-in duration-300">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                      <CheckCircle className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-2xl font-mono font-bold mb-2">Access Granted</h3>
+                    <p className="text-muted-foreground text-center mb-6">
+                      Your spot in the secure queue is reserved. We'll reach out when the beta terminal is ready.
+                    </p>
+                    
+                    <div className="w-full space-y-3">
+                      <p className="text-xs font-mono text-primary uppercase tracking-widest text-center">Priority Tasks</p>
+                      <Button 
+                        variant="outline" 
+                        className="w-full gap-2 border-primary/30 hover:bg-primary/10"
+                        onClick={() => window.open('https://github.com/manu-j3400/coming-soon', '_blank')}
+                      >
+                        <span className="text-primary text-lg">★</span> Star on GitHub
+                      </Button>
+                      <p className="text-[10px] text-muted-foreground text-center">
+                        Starring the repo helps us move faster toward public beta.
+                      </p>
+                    </div>
+                  </div>
                 ) : (
-                  <>
-                    Join Waitlist
-                    <ArrowRight className="w-4 h-4" />
-                  </>
+                  <form onSubmit={handleSubmit} className="relative z-10 flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    {/* Your existing form code */}
+                  </form>
                 )}
               </Button>
             </form>
