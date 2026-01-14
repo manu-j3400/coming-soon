@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@marsidev/react-turnstile": "^1.4.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -41,6 +42,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@supabase/supabase-js": "^2.90.1",
     "@tanstack/react-query": "^5.83.0",
+    "@vercel/node": "^5.5.19",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -71,6 +73,7 @@
     "@types/d3-time": "^3.0.4",
     "@types/diff-match-patch": "^1.0.36",
     "@types/estree": "^1.0.8",
+    "@types/express": "^5.0.6",
     "@types/hast": "^3.0.4",
     "@types/linkify-it": "^5.0.0",
     "@types/node": "^22.16.5",

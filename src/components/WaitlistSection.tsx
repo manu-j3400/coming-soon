@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { NeonInput } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { Mail, ArrowRight, Users, CheckCircle, Github, RefreshCw } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 const WaitlistSection = () => {
   const [email, setEmail] = useState("");
+  const [token, setToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -14,45 +15,34 @@ const WaitlistSection = () => {
   // loads by default, allowing you to enter different emails easily.
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email.trim()) {
-      toast({ title: "Email required", variant: "destructive" });
-      return;
-    }
+  e.preventDefault();
+  
+  if (!token) {
+    toast({ 
+      title: "Security Verification Required", 
+      description: "Please wait for the security check to complete.",
+      variant: "destructive" 
+    });
+    return;
+  }
 
-    setIsSubmitting(true);
-    
-    try {
-      const { error } = await supabase
-        .from('waitlist')
-        .insert([{ email }]);
+  setIsSubmitting(true);
 
-      if (error) {
-        // Handle Duplicate (Postgres code 23505)
-        if (error.code === '23505') {
-          toast({
-            title: "Already on the list!",
-            description: "This email is already registered.",
-          });
-          setIsSubmitted(true);
-          return;
-        }
-        throw error;
-      }
+  try {
+    const response = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, token }),
+    });
 
-      // On Success
+    if (response.ok) {
       setIsSubmitted(true);
-      setEmail("");
-      toast({ title: "Access Granted", description: "You're on the list!" });
-
-    } catch (error: any) {
-      console.error('Error:', error);
-      toast({
-        title: "Connection Error",
-        description: "Check your database schema or connection.",
-        variant: "destructive",
-      });
+      toast({ title: "Secure Entry Confirmed" });
+    } else {
+      throw new Error("Security blockage");
+    }
+    } catch (error) {
+      toast({ title: "Connection Terminated", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -82,6 +72,17 @@ const WaitlistSection = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubmitting}
                 />
+
+                <div className="mt-4 flex justify-center">
+                  <Turnstile 
+                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY} 
+                    onSuccess={(t) => {
+                      console.log("Turnstile Token Received:", t); // This helps us debug
+                      setToken(t);
+                    }} 
+                    onError={() => console.error("Turnstile Widget Failed to Load")} 
+                  />
+                </div>
               </div>
               <Button type="submit" variant="hero" disabled={isSubmitting} className="min-w-[140px]">
                 {isSubmitting ? "Syncing..." : "Join Waitlist"}
