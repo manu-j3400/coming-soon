@@ -2,19 +2,13 @@ import { Button } from "@/components/ui/button";
 
 const LogoMark = () => (
   <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 glow-cyan">
-    <svg
-      viewBox="0 0 24 24"
-      className="w-5 h-5 text-primary"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M15 7a6 6 0 1 0 0 10" />
-      <path d="M13 8v8h4" />
-    </svg>
+    <img
+      src="/android-chrome-192x192.png"
+      alt="Cyber Sentinel logo"
+      className="w-6 h-6"
+      loading="eager"
+      decoding="async"
+    />
   </div>
 );
 
