@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { NeonInput } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { Turnstile } from "@marsidev/react-turnstile";
-import { Mail, ArrowRight, Users, CheckCircle, Github, RefreshCw } from "lucide-react";
+import { Mail, Users, CheckCircle, Github, RefreshCw } from "lucide-react";
 
 const WaitlistSection = () => {
   const [email, setEmail] = useState("");
-  const [token, setToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -15,32 +13,23 @@ const WaitlistSection = () => {
   // loads by default, allowing you to enter different emails easily.
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (!token) {
-    toast({ 
-      title: "Security Verification Required", 
-      description: "Please wait for the security check to complete.",
-      variant: "destructive" 
-    });
-    return;
-  }
+    e.preventDefault();
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
 
-  try {
-    const response = await fetch('/api/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, token }),
-    });
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
 
-    if (response.ok) {
-      setIsSubmitted(true);
-      toast({ title: "Secure Entry Confirmed" });
-    } else {
-      throw new Error("Security blockage");
-    }
+      if (response.ok) {
+        setIsSubmitted(true);
+        toast({ title: "Secure Entry Confirmed" });
+      } else {
+        throw new Error("Security blockage");
+      }
     } catch (error) {
       toast({ title: "Connection Terminated", variant: "destructive" });
     } finally {
@@ -50,41 +39,36 @@ const WaitlistSection = () => {
 
   return (
     <section id="waitlist" className="relative py-24 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent z-0" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent z-0" />
       
       <div className="container relative z-10 mx-auto px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/30 mb-8">
-            <Mail className="w-8 h-8 text-primary" />
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs font-mono text-primary/80 mb-6">
+            <Users className="w-3.5 h-3.5" />
+            500+ developers waiting
           </div>
           
-          <h2 className="text-3xl md:text-5xl font-bold font-mono mb-4">
-            Get <span className="text-gradient">Early Access</span>
+          <h2 className="text-4xl md:text-6xl font-bold font-mono mb-4">
+            Join the <span className="text-gradient">Beta Waitlist</span>
           </h2>
+          <p className="text-muted-foreground text-base md:text-lg mb-10">
+            Be the first to experience AI-powered code security. Limited spots available.
+          </p>
           
           {!isSubmitted ? (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <div className="flex-1">
-                <NeonInput
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+              <div className="flex flex-1 items-center gap-3 rounded-full border border-white/10 bg-background/40 px-4 py-2 shadow-[0_0_0_1px_rgba(34,211,238,0.1)] backdrop-blur">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                <Input
                   type="email"
                   placeholder="developer@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubmitting}
+                  className="h-8 border-0 bg-transparent px-0 py-0 text-sm font-mono focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
-
-                <div className="mt-4 flex justify-center">
-                  <Turnstile 
-                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY} 
-                    onSuccess={(t) => {
-                      console.log("Turnstile Token Received:", t); // This helps us debug
-                      setToken(t);
-                    }} 
-                    onError={() => console.error("Turnstile Widget Failed to Load")} 
-                  />
-                </div>
               </div>
-              <Button type="submit" variant="hero" disabled={isSubmitting} className="min-w-[140px]">
+              <Button type="submit" variant="hero" disabled={isSubmitting} className="h-12 rounded-full px-6 font-mono">
                 {isSubmitting ? "Syncing..." : "Join Waitlist"}
               </Button>
             </form>
@@ -113,6 +97,11 @@ const WaitlistSection = () => {
               </div>
             </div>
           )}
+          {!isSubmitted ? (
+            <p className="text-xs text-muted-foreground mt-4">
+              No spam. Unsubscribe anytime. We respect your privacy.
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

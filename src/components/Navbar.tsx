@@ -1,5 +1,22 @@
-import { Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const LogoMark = () => (
+  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 glow-cyan">
+    <svg
+      viewBox="0 0 24 24"
+      className="w-5 h-5 text-primary"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 7a6 6 0 1 0 0 10" />
+      <path d="M13 8v8h4" />
+    </svg>
+  </div>
+);
 
 const Navbar = () => {
   return (
@@ -8,9 +25,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 glow-cyan">
-              <Shield className="w-5 h-5 text-primary" />
-            </div>
+            <LogoMark />
             <span className="font-mono font-bold text-lg text-foreground">Cyber Sentinel</span>
           </div>
           

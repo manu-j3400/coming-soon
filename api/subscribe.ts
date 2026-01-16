@@ -8,9 +8,32 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-if (process.env.NODE_ENV === 'production' && process.env.TURNSTILE_SECRET_KEY?.includes('000000000AA')) {
-  console.error("CRITICAL: Production is using insecure Testing Keys!");
-}
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitBuckets = new Map<string, number[]>();
+
+const getClientIp = (req: VercelRequest) => {
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const rawIp = Array.isArray(forwardedFor)
+    ? forwardedFor[0]
+    : forwardedFor?.split(',')[0];
+  return (rawIp || req.socket.remoteAddress || '127.0.0.1').toString().trim();
+};
+
+const isRateLimited = (ip: string) => {
+  const now = Date.now();
+  const bucket = rateLimitBuckets.get(ip) ?? [];
+  const recent = bucket.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
+
+  if (recent.length >= RATE_LIMIT_MAX) {
+    rateLimitBuckets.set(ip, recent);
+    return true;
+  }
+
+  recent.push(now);
+  rateLimitBuckets.set(ip, recent);
+  return false;
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. Strict Method Control
@@ -18,21 +41,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email, token } = req.body;
+  const { email } = req.body;
 
   try {
-    // 2. Turnstile Verification (The Bot Wall)
-    const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-    const verificationResponse = await fetch(verifyUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${token}`,
-    });
-
-    const verificationData = await verificationResponse.json();
-
-    if (!verificationData.success) {
-      return res.status(403).json({ error: 'Security challenge failed' });
+    // 2. Rate limiting (best-effort for serverless)
+    const ip = getClientIp(req);
+    if (isRateLimited(ip)) {
+      return res.status(429).json({ error: 'Too many requests' });
     }
 
     // 3. Paranoid Input Validation
@@ -46,10 +61,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 4. Metadata Extraction & Hashing
-    // Ensure ip is a string and handle the undefined case
-    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').toString();
-
-    // Now .update(ip) will work because ip is definitely a string
     const ipHash = crypto.createHash('sha256').update(ip).digest('hex');
     const emailHash = crypto.createHash('sha256').update(email.toLowerCase().trim()).digest('hex');
 

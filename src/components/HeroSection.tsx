@@ -20,7 +20,9 @@ const HeroSection = () => {
         {/* Main Headline */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-mono leading-tight mb-6 animate-fade-up opacity-0 animation-delay-200">
           Stop Malicious Code{" "}
-          <span className="text-gradient">Before It Executes.</span>
+          <span className="text-gradient">
+            Before It Executes.
+          </span>
         </h1>
         
         {/* Subheadline */}
